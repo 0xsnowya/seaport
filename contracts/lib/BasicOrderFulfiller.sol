@@ -4,8 +4,11 @@ pragma solidity ^0.8.13;
 import { ConduitInterface } from "../interfaces/ConduitInterface.sol";
 
 import {
+    // 订单类型
     OrderType,
+    // NFT项目类型
     ItemType,
+    // 给seller转移的资产类型
     BasicOrderRouteType
 } from "./ConsiderationEnums.sol";
 
@@ -29,6 +32,11 @@ import "./ConsiderationConstants.sol";
  *         orders with minimal overhead. See documentation for details on what
  *         qualifies as a basic order.
  */
+/**
+ * 合约简介：基础订单的执行
+ * 功能简介：包含最小支付费用的一些功能
+ * 参数简介：继承订单验证合约（验证订单的有效性：订单是都有效，是否删除，拆分还是全部执行；及更新订单的状态）
+ * */
 contract BasicOrderFulfiller is OrderValidator {
     /**
      * @dev Derive and set hashes, reference chainId, and associated domain
@@ -65,28 +73,40 @@ contract BasicOrderFulfiller is OrderValidator {
      *
      * @return A boolean indicating whether the order has been fulfilled.
      */
+    /** 
+     * 功能简介：是一个内部函数，执行基础订单，支持6种资产交换；Native => ERC721、Native => ERC1155、
+                ERC20 => ERC721、ERC20 => ERC1155、ERC721 => ERC2O、ERC1155 => ERC20 ;
+     * 参数简介：包含基的础订单，即购买、出售授权等的相关参数
+     **/
     function _validateAndFulfillBasicOrder(
         BasicOrderParameters calldata parameters
     ) internal returns (bool) {
         // Declare enums for order type & route to extract from basicOrderType.
+        // 基础订单路由：支付给售卖者的资产
         BasicOrderRouteType route;
+        // 订单类型：交易对，包含多种类型
         OrderType orderType;
 
         // Declare additional recipient item type to derive from the route type.
+        // 指定接收的资产类型
         ItemType additionalRecipientsItemType;
 
         // Utilize assembly to extract the order type and the basic order route.
+        // 使用assembly，获取订单类型，和基础订单支付路由
         assembly {
             // Read basicOrderType from calldata.
+            // 基础订单类型
             let basicOrderType := calldataload(BasicOrder_basicOrderType_cdPtr)
 
             // Mask all but 2 least-significant bits to derive the order type.
+            // 
             orderType := and(basicOrderType, 3)
 
             // Divide basicOrderType by four to derive the route.
             route := shr(2, basicOrderType)
 
             // If route > 1 additionalRecipient items are ERC20 (1) else Eth (0)
+            // 如果route大于1，则指定接收项目的资产类型是ERC20或者是ETH
             additionalRecipientsItemType := gt(route, 1)
         }
 
@@ -97,7 +117,9 @@ contract BasicOrderFulfiller is OrderValidator {
             // Utilize assembly to compare the route to the callvalue.
             assembly {
                 // route 0 and 1 are payable, otherwise route is not payable.
+                // 判断是否为正确的支付状态
                 correctPayableStatus := eq(
+                    // 增加指定接收的资产类型
                     additionalRecipientsItemType,
                     iszero(callvalue())
                 )
@@ -111,8 +133,11 @@ contract BasicOrderFulfiller is OrderValidator {
         }
 
         // Declare more arguments that will be derived from route and calldata.
+        // 指定接收某种资产
         address additionalRecipientsToken;
+        // 购买项目类型
         ItemType offeredItemType;
+        // 购买类型是否与指定接收类型一致
         bool offerTypeIsAdditionalRecipientsType;
 
         // Declare scope for received item type to manage stack pressure.

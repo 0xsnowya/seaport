@@ -17,6 +17,7 @@ enum OrderType {
 }
 
 // prettier-ignore
+// 基本的订单类型：交易对，如ETH-TO-ERC721(定价)、ETH-TO-ERC721(竞拍)，不同身份，操作权限不同
 enum BasicOrderType {
     // 0: no partial fills, anyone can execute
     ETH_TO_ERC721_FULL_OPEN,
@@ -92,6 +93,7 @@ enum BasicOrderType {
 }
 
 // prettier-ignore
+// 基础订单路由类型：提供哪种类型的资产，将token资产转给seller售卖者，可以进行资产组合发方式
 enum BasicOrderRouteType {
     // 0: provide Ether (or other native token) to receive offered ERC721 item.
     ETH_TO_ERC721,
@@ -113,6 +115,7 @@ enum BasicOrderRouteType {
 }
 
 // prettier-ignore
+// ItemType：项目类型，即token资产类型
 enum ItemType {
     // 0: ETH on mainnet, MATIC on polygon, etc.
     NATIVE,
@@ -136,8 +139,10 @@ enum ItemType {
 // prettier-ignore
 enum Side {
     // 0: Items that can be spent
+    // 0为buyer购买者
     OFFER,
-
+    
     // 1: Items that must be received
+    // 1为seller售卖者
     CONSIDERATION
 }

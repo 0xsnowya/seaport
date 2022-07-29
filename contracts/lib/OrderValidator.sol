@@ -24,6 +24,11 @@ import { ZoneInteraction } from "./ZoneInteraction.sol";
  * @notice OrderValidator contains functionality related to validating orders
  *         and updating their status.
  */
+/**
+ * 合约简介：
+ * 功能简介：
+ * 参数简介：
+ **/
 contract OrderValidator is Executor, ZoneInteraction {
     // Track status of each order (validated, cancelled, and fraction filled).
     mapping(bytes32 => OrderStatus) private _orderStatus;

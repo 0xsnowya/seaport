@@ -2,9 +2,13 @@
 pragma solidity ^0.8.7;
 
 import {
+    // 订单类型
     OrderType,
+    // 基础订单类型
     BasicOrderType,
+    // 项目类型
     ItemType,
+    // 身份说明：是seller还是buyer
     Side
 } from "./ConsiderationEnums.sol";
 
@@ -18,17 +22,29 @@ import {
  *      offer items that can be spent along with consideration items that must
  *      be received by their respective recipient.
  */
+ // 一个订单包含11个组件，购买者，授权者，订单类型
 struct OrderComponents {
+    // buyer购买者
     address offerer;
+    // 授权者
     address zone;
+    // 购买NFT所提供的等价资产
     OfferItem[] offer;
+    // 售卖的NFT资产项目
     ConsiderationItem[] consideration;
+    // 订单类型：交易对+售卖方式，售卖方式有定价出售和拍卖；
     OrderType orderType;
+    // 开始时间
     uint256 startTime;
+    // 结束时间
     uint256 endTime;
+    // 授权者hash
     bytes32 zoneHash;
+    // 加盐
     uint256 salt;
+    // 
     bytes32 conduitKey;
+    // 计数器：？
     uint256 counter;
 }
 
@@ -41,10 +57,15 @@ struct OrderComponents {
  *      increasing or decreasing amounts over the duration of the respective
  *      order.
  */
+ // 购买包含5个组件
 struct OfferItem {
+    // token资产类型
     ItemType itemType;
+    // 资产的合约地址
     address token;
+    // 代表tokenID、或者项目类型的hash
     uint256 identifierOrCriteria;
+    // Amount指不同订单金额的变化
     uint256 startAmount;
     uint256 endAmount;
 }
@@ -54,12 +75,14 @@ struct OfferItem {
  *      an additional sixth component designating the required recipient of the
  *      item.
  */
+// 售卖：有6个组件，5个和购买相对的组件，及1一个指定接收者的组件
 struct ConsiderationItem {
     ItemType itemType;
     address token;
     uint256 identifierOrCriteria;
     uint256 startAmount;
     uint256 endAmount;
+    // 指定接收者
     address payable recipient;
 }
 
@@ -68,10 +91,15 @@ struct ConsiderationItem {
  *      components: an item type (ETH or other native tokens, ERC20, ERC721, and
  *      ERC1155), a token address, a tokenId, and an amount.
  */
+// 支付项目：支付四要素
 struct SpentItem {
+    // 资产类型
     ItemType itemType;
+    // 资产的合约地址
     address token;
+    // tokenID
     uint256 identifier;
+    // 数量
     uint256 amount;
 }
 
@@ -80,6 +108,7 @@ struct SpentItem {
  *      the same four components as a spent item, as well as an additional fifth
  *      component designating the required recipient of the item.
  */
+// 收款项目：收款是四要素
 struct ReceivedItem {
     ItemType itemType;
     address token;
@@ -96,25 +125,43 @@ struct ReceivedItem {
  *      of the basic order (a simple derivation function for the basic order
  *      type is `basicOrderType = orderType + (4 * basicOrderRoute)`.)
  */
+// 基础订单参数，包括：同质化代币与非同质化代币的匹配；即（ETH/native(其他的平台币/ERC20代币） <=> （ERC721/ERC1155匹配）
+// basicOrderType = 订单类型 + 4次资产转发
 struct BasicOrderParameters {
     // calldata offset
+    // sell售卖资产地址
     address considerationToken; // 0x24
+    // 售卖资产的ID
     uint256 considerationIdentifier; // 0x44
+    // 售卖资产的数量？
     uint256 considerationAmount; // 0x64
+    // 购买者buyer
     address payable offerer; // 0x84
+    // 授权者
     address zone; // 0xa4
+    // 购买提供的资产合约地址
     address offerToken; // 0xc4
+    // 资产ID
     uint256 offerIdentifier; // 0xe4
+    // 购买数量
     uint256 offerAmount; // 0x104
+    // 基础订单类型
     BasicOrderType basicOrderType; // 0x124
+    // 开始时间
     uint256 startTime; // 0x144
+    // 结束时间
     uint256 endTime; // 0x164
+    // 授权者hash
     bytes32 zoneHash; // 0x184
     uint256 salt; // 0x1a4
+    // 
     bytes32 offererConduitKey; // 0x1c4
+    //
     bytes32 fulfillerConduitKey; // 0x1e4
+    // 指定的接收者
     uint256 totalOriginalAdditionalRecipients; // 0x204
     AdditionalRecipient[] additionalRecipients; // 0x224
+    // 
     bytes signature; // 0x244
     // Total length, excluding dynamic array data: 0x264 (580)
 }
@@ -124,6 +171,7 @@ struct BasicOrderParameters {
  *      implied assumption that they are supplied from the offered ETH (or other
  *      native token) or ERC20 token for the order.
  */
+// 基础订单，支持指定接收者
 struct AdditionalRecipient {
     uint256 amount;
     address payable recipient;
@@ -181,10 +229,15 @@ struct AdvancedOrder {
  *      partially or fully filled (with the fraction filled represented by a
  *      numerator and denominator).
  */
+ // 订单状态
 struct OrderStatus {
+    // 有效
     bool isValidated;
+    // 已删除
     bool isCancelled;
+    // 拆分出售
     uint120 numerator;
+    // 整体出售
     uint120 denominator;
 }
 
@@ -194,8 +247,11 @@ struct OrderStatus {
  *      alongside a merkle proof demonstrating the identifier meets the required
  *      criteria.
  */
+ // 解析器
 struct CriteriaResolver {
+    // 订单索引
     uint256 orderIndex;
+    // 买卖身份
     Side side;
     uint256 index;
     uint256 identifier;

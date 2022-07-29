@@ -21,6 +21,11 @@ import "./ConsiderationConstants.sol";
  * @notice Executor contains functions related to processing executions (i.e.
  *         transferring items, either directly or via conduits).
  */
+/**
+ * 函数简介：
+ * 功能简介：包含执行过程相关的功能函数，资产转移，或者直接通过代理
+ * 参数简介：
+ **/
 contract Executor is Verifiers, TokenTransferrer {
     /**
      * @dev Derive and set hashes, reference chainId, and associated domain
