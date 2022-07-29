@@ -75,7 +75,7 @@ contract BasicOrderFulfiller is OrderValidator {
      */
     /** 
      * 功能简介：是一个内部函数，执行基础订单，支持6种资产交换；Native => ERC721、Native => ERC1155、
-                ERC20 => ERC721、ERC20 => ERC1155、ERC721 => ERC2O、ERC1155 => ERC20 ;
+                ERC20 => ERC721、ERC20 => ERC1155、ERC721 => ERC20、ERC1155 => ERC20 ;
      * 参数简介：包含基的础订单，即购买、出售授权等的相关参数
      **/
     function _validateAndFulfillBasicOrder(
@@ -98,8 +98,7 @@ contract BasicOrderFulfiller is OrderValidator {
             // 基础订单类型
             let basicOrderType := calldataload(BasicOrder_basicOrderType_cdPtr)
 
-            // Mask all but 2 least-significant bits to derive the order type.
-            // 
+            // Mask all but 2 least-significant bits to derive the order type. 
             orderType := and(basicOrderType, 3)
 
             // Divide basicOrderType by four to derive the route.
@@ -333,6 +332,10 @@ contract BasicOrderFulfiller is OrderValidator {
      * @param offeredItemType              The item type of the offered item on
      *                                     the order.
      */
+    /** 
+     * 功能简介：
+     * 参数简介：
+     **/
     function _prepareBasicFulfillmentFromCalldata(
         BasicOrderParameters calldata parameters,
         OrderType orderType,
@@ -945,6 +948,10 @@ contract BasicOrderFulfiller is OrderValidator {
      * @param to                   The recipient of the native token transfer.
      * @param additionalRecipients The additional recipients of the order.
      */
+     /** 
+      * 功能简介：向订单的指定接收者转移ETH资产或其他平台币。平台币通过msg.value获取。
+      * 参数简介：
+      **/
     function _transferEthAndFinalize(
         uint256 amount,
         address payable to,
