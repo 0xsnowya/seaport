@@ -40,6 +40,7 @@ interface SeaportInterface {
      * @return fulfilled A boolean indicating whether the order has been
      *                   successfully fulfilled.
      */
+     // 执行基础订单
     function fulfillBasicOrder(BasicOrderParameters calldata parameters)
         external
         payable
